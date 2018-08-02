@@ -6,7 +6,20 @@ var newMap;
  */
 document.addEventListener('DOMContentLoaded', (event) => {
   initMap();
+  serviceWorkerRegistration();
 });
+
+// Registration of service worker
+
+serviceWorkerRegistration = () => {
+  if (!navigator.serviceWorker) return;
+
+  navigator.serviceWorker.register('/sw.js').then(() => {
+    console.log("Registration Success");
+  }).catch((err) => {
+    console.log("Registration Failed :", err);
+  });
+}
 
 /**
  * Initialize leaflet map
@@ -157,7 +170,7 @@ createReviewHTML = (review) => {
   name.innerHTML = ` ${review.name}`;
   name.prepend(iconuser);
   li.appendChild(name);
-  
+
 
   const date = document.createElement('p');
   //added icon for date
@@ -181,7 +194,7 @@ createReviewHTML = (review) => {
 /**
  * Add restaurant name to the breadcrumb navigation menu
  */
-fillBreadcrumb = (restaurant=self.restaurant) => {
+fillBreadcrumb = (restaurant = self.restaurant) => {
   const breadcrumb = document.getElementById('breadcrumb');
   const li = document.createElement('li');
   li.innerHTML = restaurant.name;

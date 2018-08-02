@@ -21,11 +21,11 @@ serviceWorkerRegistration = () => {
   if (!navigator.serviceWorker) return;
 
   navigator.serviceWorker.register('/sw.js').then(() => {
-      console.log("Registration Success");
+    console.log("Registration Success");
   }).catch((err) => {
-      console.log("Registration Failed :",err);
+    console.log("Registration Failed :", err);
   });
-}    
+}
 
 
 /**
@@ -88,10 +88,10 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
  */
 initMap = () => {
   self.newMap = L.map('map', {
-        center: [40.722216, -73.987501],
-        zoom: 12,
-        scrollWheelZoom: false
-      });
+    center: [40.722216, -73.987501],
+    zoom: 12,
+    scrollWheelZoom: false
+  });
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
     mapboxToken: 'pk.eyJ1Ijoic291bmFrMDciLCJhIjoiY2pqMDNmNXhiMDc2NDN2cGcwdnE3bHowbiJ9.o1T_3c2njdxtsW8e0gAE9g',
     maxZoom: 18,
@@ -180,7 +180,7 @@ createRestaurantHTML = (restaurant) => {
   image.alt = restaurant.name + ' image';
   li.append(image);
 
-  const name = document.createElement('h1');
+  const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
   li.append(name);
 
@@ -211,6 +211,7 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     // Add marker to the map
     const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.newMap);
     marker.on("click", onClick);
+
     function onClick() {
       window.location.href = marker.options.url;
     }
