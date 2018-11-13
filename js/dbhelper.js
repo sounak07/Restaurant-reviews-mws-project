@@ -1,6 +1,29 @@
 /**
  * Common database helper functions.
  */
+
+// import idb from 'idb';
+// We can't use es6. So, we need to use importScripts()
+
+// if (typeof idb === 'undefined') {
+//   self.importScripts('js/idb.js');
+// }
+
+// wait
+// The idb works in console but may not work in this file.
+// We check idb works in this file after removing it and check later if it doesn't work 
+//should i remove it? comment it now we need to check? yeah
+// This should work now but we got idb working
+// may be because idb is global.
+// I think we don't need to do imortScripts here
+// maybe because it is in same directory
+// but we may need to do it if file in different directory
+// But let's keep it for now. should we check it in browser now? yes
+
+// console.log('idb', idb);
+// Let's see if this works ok open broswer and check it
+
+
 class DBHelper {
 
   /**
@@ -12,18 +35,87 @@ class DBHelper {
     return `http://localhost:${port}/restaurants`;
   }
 
+  // Init indexdb
+
+  static indexDBInit() {
+
+    //check for service worker
+    if (!navigator.serviceWorker) {
+      return Promise.resolve();
+    }
+
+    //open indexdb
+    return idb.open('rest-db', 1, function (upgradeDb) {
+      switch (upgradeDb.oldVersion) {
+        case 0:
+          upgradeDb.createObjectStore('restaurants', {
+            keyPath: 'id'
+          });
+          console.log('idb store is created');
+          // I am not sure if this works. I think we need to give a second argument keyPath{} to the createObjectStore
+          // lets check the browser ok
+          //keyValStore.put("world", "hello");
+
+      }
+    });
+
+
+  }
+
+  //fetch restaurents
+  static getRestFrmDb(dbPromise) {
+    return dbPromise.then(function (db) {
+      if (!db) return;
+      var tx = db.transaction('restaurants');
+      var StoreRest = tx.objectStore('restaurants');
+      return StoreRest.get('restaurant-list');
+    });
+  }
+
+  //updating
+  static updateRestfrmDb(restaurants, dbPromise) {
+    return dbPromise.then(function (db) {
+      if (!db) return;
+      var tx = db.transaction('restaurants', 'readwrite');
+      var StoreRest = tx.objectStore('restaurants');
+      StoreRest.put(restaurants, 'restaurant-list');
+      tx.complete;
+    });
+  }
+
   /**
    * Fetch all restaurants.
    */
   static fetchRestaurants(callback) {
-    fetch(DBHelper.DATABASE_URL).then((res) => {
-      return res.json();
-    }).then((resturants) => {
-      callback(null, resturants);
-    }).catch((err) => {
-      const msg = (`Message: ${err}`);
-      callback(msg, null);
-    });
+    const dbPromise = DBHelper.indexDBInit();
+
+    DBHelper.getRestFrmDb(dbPromise)
+      .then((restaurants) => {
+        if (restaurants && restaurants.length > 0) {
+          callback(null, restaurants);
+        } else {
+          return fetch(DBHelper.DATABASE_URL);
+        }
+      }).then((res) => {
+
+        if (!res) return;
+
+        return res.json();
+
+      }).then((restaurants) => {
+
+        if (!restaurants) return;
+
+        DBHelper.updateRestfrmDb(restaurants, dbPromise);
+
+        callback(null, restaurants);
+
+      }).catch((e) => {
+
+        const errorMsg = (`Error Messsage: ${e}`);
+
+        callback(errorMsg, null);
+      });
   }
 
   /**
@@ -173,3 +265,5 @@ class DBHelper {
   } */
 
 }
+
+// export default DBHelper;
