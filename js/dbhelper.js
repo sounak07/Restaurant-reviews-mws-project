@@ -25,7 +25,7 @@ class DBHelper {
     }
 
     //open indexdb
-    return idb.open('rest-db', 1, function(upgradeDb) {
+    return idb.open('rest-db', 1, function (upgradeDb) {
       switch (upgradeDb.oldVersion) {
         case 0:
           upgradeDb.createObjectStore('restaurants', {
@@ -92,10 +92,15 @@ class DBHelper {
   // }
 
   static fetchRestaurants(callback) {
+
     let xhr = new XMLHttpRequest();
+
     xhr.open('GET', DBHelper.DATABASE_URL);
+
     xhr.onload = () => {
+
       if (xhr.status === 200) {
+
         const restaurants = JSON.parse(xhr.responseText);
 
         DBHelper.indexDBInit()
@@ -111,7 +116,9 @@ class DBHelper {
             return restaurants;
           })
           .then(() => {
-            console.log('successfully');
+
+            console.log('Sucess');
+
           });
         callback(null, restaurants);
       } else {
@@ -274,8 +281,7 @@ class DBHelper {
   static mapMarkerForRestaurant(restaurant, map) {
     // https://leafletjs.com/reference-1.3.0.html#marker
     const marker = new L.marker(
-      [restaurant.latlng.lat, restaurant.latlng.lng],
-      {
+      [restaurant.latlng.lat, restaurant.latlng.lng], {
         title: restaurant.name,
         alt: restaurant.name,
         url: DBHelper.urlForRestaurant(restaurant)

@@ -17,6 +17,10 @@ body {
   position: relative;
 }
 
+ul {
+  padding: 0px !important;
+}
+
 ul,
 li {
   font-family: Arial, Helvetica, sans-serif;
@@ -449,9 +453,11 @@ th {
   #restaurants-list li {
     margin-right: 40px;
   }
+
   #restaurants-list li p {
     font-size: 17px;
   }
+
   #restaurants-list li h1 {
     font-size: 19px;
   }
@@ -462,69 +468,85 @@ th {
     display: flex;
     flex-direction: column;
   }
+
   .column {
     width: 100%;
   }
+
   .inside #map {
     height: 400px;
   }
+
   nav {
     width: 100%;
   }
+
   nav h1 a:hover {
     color: rgb(10, 9, 9);
   }
+
   #breadcrumb {
     width: 80%;
   }
+
   #breadcrumb li {
     border-radius: border-box;
     font-size: 18px;
   }
+
   #restaurant-container {
     width: 100%;
     margin-left: 8px;
     margin-right: 8px;
   }
+
   #restaurant-name {
     text-align: center;
     padding-top: 10px;
     font-size: 25px;
     color: #281788;
   }
+
   #restaurant-hours {
     font-weight: bold;
   }
+
   #restaurant-cuisine {
     font-size: 25px;
     font-family: Arial, Helvetica, sans-serif;
     color: #e96342;
   }
+
   td,
   th {
     font-size: 16px;
     width: 55%;
     padding: 5px 4px 5px 2px;
   }
+
   #restaurant-address {
     font-size: 20px;
     font-family: Arial, Helvetica, sans-serif;
     color: rgb(26, 6, 83);
     margin-left: 5px;
   }
+
   #reviews-container {
     display: flex;
     align-items: center;
     flex-direction: column;
   }
+
   #reviews-container h2 {
     margin-top: 30px;
     font-size: 30px;
   }
+
   #reviews-list {
     list-style: none;
     margin: 20px;
   }
+
   #reviews-list li {
     padding: 8px 10px 5px 15px;
     margin-top: 15px;
@@ -533,19 +555,23 @@ th {
     margin-left: 5px;
     background: white;
   }
+
   #reviews-list ul {
     padding-right: 20px;
     padding-left: 20px;
     background: #ccc;
     border-radius: 25px;
   }
+
   #reviews-list li p:nth-child(4) {
     font-size: 15px;
   }
+
   @media screen and (max-width: 480px) {
     .filter-options {
       height: 150px;
     }
+
     .filter-options select {
       clear: both;
       width: 90%;
