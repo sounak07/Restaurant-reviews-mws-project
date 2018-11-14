@@ -1,8 +1,5 @@
 let restaurant;
 let newMap;
-// Why  the above variable are commented? i decleared them at the time of use below should i not?
-// I think they should be left as it is unless you did it for a reason ok lets uncomment 
-// import DBHelper from './dbhelper';
 
 /**
  * Initialize map as soon as the page is loaded.

@@ -2,122 +2,136 @@
  * Common database helper functions.
  */
 
-// import idb from 'idb';
-// We can't use es6. So, we need to use importScripts()
-
 // if (typeof idb === 'undefined') {
 //   self.importScripts('js/idb.js');
 // }
 
-// wait
-// The idb works in console but may not work in this file.
-// We check idb works in this file after removing it and check later if it doesn't work 
-//should i remove it? comment it now we need to check? yeah
-// This should work now but we got idb working
-// may be because idb is global.
-// I think we don't need to do imortScripts here
-// maybe because it is in same directory
-// but we may need to do it if file in different directory
-// But let's keep it for now. should we check it in browser now? yes
-
-// console.log('idb', idb);
-// Let's see if this works ok open broswer and check it
-
-
 class DBHelper {
-
   /**
    * Database URL.
    * Change this to restaurants.json file location on your server.
    */
   static get DATABASE_URL() {
-    const port = 1337 // Change this to your server port
+    const port = 1337; // Change this to your server port
     return `http://localhost:${port}/restaurants`;
   }
 
   // Init indexdb
 
   static indexDBInit() {
-
     //check for service worker
     if (!navigator.serviceWorker) {
       return Promise.resolve();
     }
 
     //open indexdb
-    return idb.open('rest-db', 1, function (upgradeDb) {
+    return idb.open('rest-db', 1, function(upgradeDb) {
       switch (upgradeDb.oldVersion) {
         case 0:
           upgradeDb.createObjectStore('restaurants', {
             keyPath: 'id'
           });
-          console.log('idb store is created');
-          // I am not sure if this works. I think we need to give a second argument keyPath{} to the createObjectStore
-          // lets check the browser ok
-          //keyValStore.put("world", "hello");
-
       }
     });
-
-
   }
 
-  //fetch restaurents
-  static getRestFrmDb(dbPromise) {
-    return dbPromise.then(function (db) {
-      if (!db) return;
-      var tx = db.transaction('restaurants');
-      var StoreRest = tx.objectStore('restaurants');
-      return StoreRest.get('restaurant-list');
-    });
-  }
+  // //fetch restaurents
+  // static getRestFrmDb(dbPromise) {
+  //   return dbPromise.then(function (db) {
+  //     if (!db) return;
+  //     var tx = db.transaction('restaurants');
+  //     var StoreRest = tx.objectStore('restaurants');
+  //     return StoreRest.getAll('restaurant-list');
+  //   });
+  // }
 
-  //updating
-  static updateRestfrmDb(restaurants, dbPromise) {
-    return dbPromise.then(function (db) {
-      if (!db) return;
-      var tx = db.transaction('restaurants', 'readwrite');
-      var StoreRest = tx.objectStore('restaurants');
-      StoreRest.put(restaurants, 'restaurant-list');
-      tx.complete;
-    });
-  }
+  // //updating
+  // static updateRestfrmDb(restaurants, dbPromise) {
+  //   return dbPromise.then(function (db) {
+  //     if (!db) return;
+  //     var tx = db.transaction('restaurants', 'readwrite');
+  //     var StoreRest = tx.objectStore('restaurants');
+  //     StoreRest.put(restaurants, 'restaurant-list');
+  //     tx.complete;
+  //   });
+  // }
 
-  /**
-   * Fetch all restaurants.
-   */
+  // /**
+  //  * Fetch all restaurants.
+  //  */
+  // static fetchRestaurants(callback) {
+  //   const dbPromise = DBHelper.indexDBInit();
+
+  //   DBHelper.getRestFrmDb(dbPromise)
+  //     .then((restaurants) => {
+  //       if (restaurants && restaurants.length > 0) {
+  //         callback(null, restaurants);
+  //       } else {
+  //         return fetch(DBHelper.DATABASE_URL);
+  //       }
+  //     }).then((res) => {
+
+  //       if (!res) return;
+
+  //       return res.json();
+
+  //     }).then((restaurants) => {
+
+  //       if (!restaurants) return;
+
+  //       DBHelper.updateRestfrmDb(restaurants, dbPromise);
+
+  //       callback(null, restaurants);
+
+  //     }).catch((e) => {
+
+  //       const errorMsg = (`Error Messsage: ${e}`);
+
+  //       callback(errorMsg, null);
+  //     });
+  // }
+
   static fetchRestaurants(callback) {
-    const dbPromise = DBHelper.indexDBInit();
+    let xhr = new XMLHttpRequest();
+    xhr.open('GET', DBHelper.DATABASE_URL);
+    xhr.onload = () => {
+      if (xhr.status === 200) {
+        const restaurants = JSON.parse(xhr.responseText);
 
-    DBHelper.getRestFrmDb(dbPromise)
-      .then((restaurants) => {
-        if (restaurants && restaurants.length > 0) {
-          callback(null, restaurants);
-        } else {
-          return fetch(DBHelper.DATABASE_URL);
-        }
-      }).then((res) => {
+        DBHelper.indexDBInit()
+          .then(db => {
+            if (!db) return;
 
-        if (!res) return;
+            let tx = db.transaction('restaurants', 'readwrite');
+            let store = tx.objectStore('restaurants');
+            restaurants.forEach(restaurant => {
+              store.put(restaurant);
+            });
 
-        return res.json();
-
-      }).then((restaurants) => {
-
-        if (!restaurants) return;
-
-        DBHelper.updateRestfrmDb(restaurants, dbPromise);
-
+            return restaurants;
+          })
+          .then(() => {
+            console.log('successfully');
+          });
         callback(null, restaurants);
-
-      }).catch((e) => {
-
-        const errorMsg = (`Error Messsage: ${e}`);
-
-        callback(errorMsg, null);
-      });
+      } else {
+        DBHelper.indexDBInit()
+          .then(db => {
+            let tx = db.transaction('restaurants');
+            let store = tx.objectStore('restaurants');
+            return store.getAll();
+          })
+          .then(restaurants => {
+            callback(null, restaurants);
+          })
+          .catch(() => {
+            const error = `Failed as ${xhr.status}`;
+            callback(error, null);
+          });
+      }
+    };
+    xhr.send();
   }
-
   /**
    * Fetch a restaurant by its ID.
    */
@@ -128,9 +142,11 @@ class DBHelper {
         callback(error, null);
       } else {
         const restaurant = restaurants.find(r => r.id == id);
-        if (restaurant) { // Got the restaurant
+        if (restaurant) {
+          // Got the restaurant
           callback(null, restaurant);
-        } else { // Restaurant does not exist in the database
+        } else {
+          // Restaurant does not exist in the database
           callback('Restaurant does not exist', null);
         }
       }
@@ -172,17 +188,23 @@ class DBHelper {
   /**
    * Fetch restaurants by a cuisine and a neighborhood with proper error handling.
    */
-  static fetchRestaurantByCuisineAndNeighborhood(cuisine, neighborhood, callback) {
+  static fetchRestaurantByCuisineAndNeighborhood(
+    cuisine,
+    neighborhood,
+    callback
+  ) {
     // Fetch all restaurants
     DBHelper.fetchRestaurants((error, restaurants) => {
       if (error) {
         callback(error, null);
       } else {
-        let results = restaurants
-        if (cuisine != 'all') { // filter by cuisine
+        let results = restaurants;
+        if (cuisine != 'all') {
+          // filter by cuisine
           results = results.filter(r => r.cuisine_type == cuisine);
         }
-        if (neighborhood != 'all') { // filter by neighborhood
+        if (neighborhood != 'all') {
+          // filter by neighborhood
           results = results.filter(r => r.neighborhood == neighborhood);
         }
         callback(null, results);
@@ -200,9 +222,13 @@ class DBHelper {
         callback(error, null);
       } else {
         // Get all neighborhoods from all restaurants
-        const neighborhoods = restaurants.map((v, i) => restaurants[i].neighborhood)
+        const neighborhoods = restaurants.map(
+          (v, i) => restaurants[i].neighborhood
+        );
         // Remove duplicates from neighborhoods
-        const uniqueNeighborhoods = neighborhoods.filter((v, i) => neighborhoods.indexOf(v) == i)
+        const uniqueNeighborhoods = neighborhoods.filter(
+          (v, i) => neighborhoods.indexOf(v) == i
+        );
         callback(null, uniqueNeighborhoods);
       }
     });
@@ -218,9 +244,11 @@ class DBHelper {
         callback(error, null);
       } else {
         // Get all cuisines from all restaurants
-        const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type)
+        const cuisines = restaurants.map((v, i) => restaurants[i].cuisine_type);
         // Remove duplicates from cuisines
-        const uniqueCuisines = cuisines.filter((v, i) => cuisines.indexOf(v) == i)
+        const uniqueCuisines = cuisines.filter(
+          (v, i) => cuisines.indexOf(v) == i
+        );
         callback(null, uniqueCuisines);
       }
     });
@@ -230,26 +258,29 @@ class DBHelper {
    * Restaurant page URL.
    */
   static urlForRestaurant(restaurant) {
-    return (`./restaurant.html?id=${restaurant.id}`);
+    return `./restaurant.html?id=${restaurant.id}`;
   }
 
   /**
    * Restaurant image URL.
    */
   static imageUrlForRestaurant(restaurant) {
-    return (`/img/${restaurant.photograph}.jpg`);
+    return `/img/${restaurant.photograph}.jpg`;
   }
 
   /**
    * Map marker for a restaurant.
    */
   static mapMarkerForRestaurant(restaurant, map) {
-    // https://leafletjs.com/reference-1.3.0.html#marker  
-    const marker = new L.marker([restaurant.latlng.lat, restaurant.latlng.lng], {
-      title: restaurant.name,
-      alt: restaurant.name,
-      url: DBHelper.urlForRestaurant(restaurant)
-    })
+    // https://leafletjs.com/reference-1.3.0.html#marker
+    const marker = new L.marker(
+      [restaurant.latlng.lat, restaurant.latlng.lng],
+      {
+        title: restaurant.name,
+        alt: restaurant.name,
+        url: DBHelper.urlForRestaurant(restaurant)
+      }
+    );
     marker.addTo(newMap);
     return marker;
   }
@@ -263,7 +294,6 @@ class DBHelper {
     );
     return marker;
   } */
-
 }
 
 // export default DBHelper;
