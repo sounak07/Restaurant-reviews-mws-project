@@ -56,40 +56,10 @@ class DBHelper {
   //   });
   // }
 
-  // /**
-  //  * Fetch all restaurants.
-  //  */
-  // static fetchRestaurants(callback) {
-  //   const dbPromise = DBHelper.indexDBInit();
+  /**
+   * Fetch all restaurants.
+   */
 
-  //   DBHelper.getRestFrmDb(dbPromise)
-  //     .then((restaurants) => {
-  //       if (restaurants && restaurants.length > 0) {
-  //         callback(null, restaurants);
-  //       } else {
-  //         return fetch(DBHelper.DATABASE_URL);
-  //       }
-  //     }).then((res) => {
-
-  //       if (!res) return;
-
-  //       return res.json();
-
-  //     }).then((restaurants) => {
-
-  //       if (!restaurants) return;
-
-  //       DBHelper.updateRestfrmDb(restaurants, dbPromise);
-
-  //       callback(null, restaurants);
-
-  //     }).catch((e) => {
-
-  //       const errorMsg = (`Error Messsage: ${e}`);
-
-  //       callback(errorMsg, null);
-  //     });
-  // }
 
   static fetchRestaurants(callback) {
 
@@ -108,9 +78,9 @@ class DBHelper {
             if (!db) return;
 
             let tx = db.transaction('restaurants', 'readwrite');
-            let store = tx.objectStore('restaurants');
+            let StoreRest = tx.objectStore('restaurants');
             restaurants.forEach(restaurant => {
-              store.put(restaurant);
+              StoreRest.put(restaurant);
             });
 
             return restaurants;
@@ -125,8 +95,8 @@ class DBHelper {
         DBHelper.indexDBInit()
           .then(db => {
             let tx = db.transaction('restaurants');
-            let store = tx.objectStore('restaurants');
-            return store.getAll();
+            let StoreRest = tx.objectStore('restaurants');
+            return StoreRest.getAll();
           })
           .then(restaurants => {
             callback(null, restaurants);

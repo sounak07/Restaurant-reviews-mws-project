@@ -54,9 +54,6 @@ initMap = () => {
   });
 };
 
-console.log(restaurant.latlng.lat);
-console.log(restaurant.latlng.lng);
-
 
 /* window.initMap = () => {
   fetchRestaurantFromURL((error, restaurant) => {
