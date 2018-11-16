@@ -32,6 +32,7 @@ class DBHelper {
             keyPath: 'id'
           });
       }
+      store.createIndex('by-id', 'id');
     });
   }
 

@@ -28,13 +28,14 @@
         <a href="/">
           <i class="fa fa-utensils"></i>Restaurant Reviews</a>
       </h1>
+
+      <!-- Beginning breadcrumb -->
+      <ul aria-label="breadcrumb" id="breadcrumb">
+        <li>
+          <a href="/">Home</a>
+        </li>
+      </ul>
     </nav>
-    <!-- Beginning breadcrumb -->
-    <ul aria-label="breadcrumb" id="breadcrumb">
-      <li>
-        <a href="/">Home</a>
-      </li>
-    </ul>
     <!-- End breadcrumb -->
     <!-- End nav -->
   </header>
@@ -53,11 +54,11 @@
     <!-- Beginning restaurant -->
     <div class="column" id="info">
       <section id="restaurant-container">
-        <h1 id="restaurant-name"></h1>
+        <h2 id="restaurant-name"></h2>
         <div id="container">
           <img id="restaurant-img">
-          <p id="restaurant-cuisine"></p>
-          <p id="restaurant-address"></p>
+          <p tabindex="0" id="restaurant-cuisine"></p>
+          <p tabindex="1" id="restaurant-address"></p>
           <table id="restaurant-hours"></table>
         </div>
       </section>
