@@ -5,6 +5,8 @@ self.addEventListener('install', function (event) {
     caches.open(staticCache).then(function (cache) {
       return cache.addAll([
         '/',
+        'index.html',
+        'restaurant.html',
         'https://unpkg.com/leaflet@1.3.1/dist/leaflet.css',
         'css/styles.css',
         'https://unpkg.com/leaflet@1.3.1/dist/leaflet.js',
@@ -47,7 +49,9 @@ self.addEventListener('activate', function (event) {
 
 self.addEventListener('fetch', function (event) {
   event.respondWith(
-    caches.match(event.request).then(function (response) {
+    caches.match(event.request, {
+      ignoreSearch: true
+    }).then(function (response) {
       if (response) return response;
       else return fetch(event.request);
     })
