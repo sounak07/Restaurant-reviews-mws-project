@@ -28,11 +28,11 @@ class DBHelper {
     return idb.open('rest-db', 1, function (upgradeDb) {
       switch (upgradeDb.oldVersion) {
         case 0:
-          upgradeDb.createObjectStore('restaurants', {
+          var store = upgradeDb.createObjectStore('restaurants', {
             keyPath: 'id'
           });
+          store.createIndex('by-id', 'id');
       }
-      store.createIndex('by-id', 'id');
     });
   }
 
