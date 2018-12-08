@@ -32,6 +32,9 @@ class DBHelper {
             keyPath: 'id'
           });
           store.createIndex('by-id', 'id');
+
+        case 1:
+          upgradeDb.createObjectStore('reviews');
       }
     });
   }
@@ -56,6 +59,14 @@ class DBHelper {
   //     tx.complete;
   //   });
   // }
+
+  /**
+   * Fetch all reviews.
+   */
+
+
+
+
 
   /**
    * Fetch all restaurants.
