@@ -84,13 +84,17 @@ section {
 }
 
 
-.heart--clicked {
+.heart-on {
   color: #f10303;
 }
 
-.heart--not-clicked {
+.heart-off {
   color: #777;
 }
+
+/* form */
+
+
 
 /* ====================== Navigation ====================== */
 
@@ -576,6 +580,14 @@ th {
     font-size: 15px;
   }
 
+  #frm {
+    margin-left: 40px;
+  }
+
+  .form-control {
+    width: 180% !important;
+  }
+
   @media screen and (max-width: 480px) {
     .filter-options {
       height: 150px;
@@ -587,5 +599,7 @@ th {
       position: relative;
       top: 1px;
     }
+
+
   }
 }

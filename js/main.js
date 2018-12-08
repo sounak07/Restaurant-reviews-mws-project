@@ -173,12 +173,12 @@ const fillRestaurantsHTML = (restaurants = self.restaurants) => {
  * Create restaurant HTML.
  */
 function loveOn(heart_btn) {
-  if (heart_btn.classList.contains('heart--not-clicked')) {
-    heart_btn.classList.remove('heart--not-clicked');
-    heart_btn.classList.add('heart--clicked');
+  if (heart_btn.classList.contains('heart-off')) {
+    heart_btn.classList.remove('heart-off');
+    heart_btn.classList.add('heart-on');
   } else {
-    heart_btn.classList.remove('heart--clicked');
-    heart_btn.classList.add('heart--not-clicked');
+    heart_btn.classList.remove('heart-on');
+    heart_btn.classList.add('heart-off');
   }
 }
 
@@ -201,7 +201,7 @@ const createRestaurantHTML = (restaurant) => {
   const fav = document.createElement('span');
   fav.classList.add('fa');
   fav.classList.add('fa-heart');
-  fav.classList.add('heart--not-clicked');
+  fav.classList.add('heart-off');
   fav.setAttribute('id', 'id--heart-' + restaurant.id.toString());
   fav.addEventListener('click', _ => {
     let heart_btn = document.getElementById('id--heart-' + restaurant.id.toString());
