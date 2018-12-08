@@ -172,6 +172,17 @@ const fillRestaurantsHTML = (restaurants = self.restaurants) => {
 /**
  * Create restaurant HTML.
  */
+function loveOn(heart_btn) {
+  if (heart_btn.classList.contains('heart--not-clicked')) {
+    heart_btn.classList.remove('heart--not-clicked');
+    heart_btn.classList.add('heart--clicked');
+  } else {
+    heart_btn.classList.remove('heart--clicked');
+    heart_btn.classList.add('heart--not-clicked');
+  }
+}
+
+
 const createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
@@ -185,6 +196,20 @@ const createRestaurantHTML = (restaurant) => {
   const name = document.createElement('h2');
   name.innerHTML = restaurant.name;
   li.append(name);
+
+
+  const fav = document.createElement('span');
+  fav.classList.add('fa');
+  fav.classList.add('fa-heart');
+  fav.classList.add('heart--not-clicked');
+  fav.setAttribute('id', 'id--heart-' + restaurant.id.toString());
+  fav.addEventListener('click', _ => {
+    let heart_btn = document.getElementById('id--heart-' + restaurant.id.toString());
+    loveOn(heart_btn);
+  });
+  li.append(fav);
+
+
 
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;

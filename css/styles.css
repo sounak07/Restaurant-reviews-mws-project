@@ -83,6 +83,15 @@ section {
   text-transform: uppercase;
 }
 
+
+.heart--clicked {
+  color: #f10303;
+}
+
+.heart--not-clicked {
+  color: #777;
+}
+
 /* ====================== Navigation ====================== */
 
 nav {
