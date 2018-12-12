@@ -6,6 +6,8 @@
 //   self.importScripts('js/idb.js');
 // }
 
+sync_reviews = [];
+
 class DBHelper {
   /**
    * Database URL.
@@ -61,10 +63,116 @@ class DBHelper {
   // }
 
   /**
-   * Fetch all reviews.
+   * Fetch all reviews by id.
    */
 
+  static getReviewsByRestaurant(dbPromise, restaurant_id) {
+    return dbPromise.then((db) => {
+      if (!db) return;
+      let tx = db.transaction('reviews');
+      let reviewStore = tx.objectStore('reviews');
+      return reviewStore.get(restaurant_id);
+    });
+  }
 
+
+  // update reviews
+
+  static updateReviewsToDb(dbPromise, restaurant_id, review) {
+    console.log('updated1!');
+    return dbPromise.then(db => {
+      if (!db) return;
+      let tx = db.transaction('reviews', 'readwrite');
+      let reviewStore = tx.objectStore('reviews');
+      reviewStore.put(review, restaurant_id);
+      tx.complete;
+      console.log('updated!');
+    });
+  }
+
+
+  static fetchReviewsByRestaurantId(restaurant_id) {
+    const review_url = `http://localhost:1337/reviews/?restaurant_id=${restaurant_id}`;
+    const dbPromise = DBHelper.initIDB();
+
+    if (navigator.onLine) {
+      return fetch(review_url)
+        .then(response => response.json())
+        .then(reviews => {
+          if (!reviews || reviews.length === 0)
+            throw new Error('No review found to updated!');
+          DBHelper.updateReviewsToDb(dbPromise, restaurant_id, reviews);
+          console.log(reviews_to_sync);
+          return reviews;
+        }).catch(_ => {
+          return DBHelper.getReviewsByRestaurant(dbPromise, restaurant_id)
+            .then(reviews => {
+              if (reviews && reviews.length > 0)
+                return reviews;
+            })
+        });
+    } else {
+      return DBHelper.getReviewsByRestaurant(dbPromise, restaurant_id)
+        .then(reviews => {
+          if (reviews && reviews.length > 0)
+            return reviews;
+        });
+    }
+
+    /*
+    if (navigator.onLine) {
+      return fetch(review_url)
+        .then(response => response.json())
+        .then(reviews => {
+          if (!reviews || reviews.length === 0)
+            throw new Error('No review found to updated!');
+          DBHelper.updateReviewsToDb(dbPromise, restaurant_id, reviews);
+          console.log(reviews);
+          return reviews;
+          }).catch( _ => {
+            return DBHelper.getReviewsByRestaurant(dbPromise, restaurant_id)
+              .then(reviews => {
+                if (reviews && reviews.length > 0)
+                  return reviews;
+              });
+          });
+        } else {
+          return DBHelper.getReviewsByRestaurant(dbPromise, restaurant_id)
+            .then(reviews => {
+              if (reviews && reviews.length > 0)
+                return reviews;
+            });
+        }*/
+  }
+
+
+
+  static putReviewsInDb(review_dict) {
+    const dbPromise = DBHelper.initIDB();
+    console.log(review_dict.restaurant_id);
+    console.log(typeof review_dict.restaurant_id);
+    DBHelper.getReviewsByRestaurant(dbPromise, review_dict.restaurant_id)
+      .then(reviews => {
+        if (!reviews) return;
+        reviews.push(reviews);
+        DBHelper.updateReviewsToDb(dbPromise, review_dict.restaurant_id, review_dict)
+        if (navigator.onLine) {
+          const review_url = 'http://localhost:1337/reviews';
+          console.log('putReviewsInDb2');
+          return fetch(review_url, {
+            method: 'POST',
+            body: JSON.stringify(review_dict),
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+        } else {
+          reviews_to_sync.push(review_dict)
+        }
+      }).catch(error => {
+        console.log(error);
+      })
+  }
 
 
 

@@ -82,10 +82,20 @@
     <div class="col-6" id="frm">
       <form>
         <div class="form-group">
-          <label for="exampleInputEmail1" style="font-size: 20px;">Your review</label>
-          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Reviews">
+          <input type="text" id="nam" class="form-control" aria-describedby="name" placeholder="Name">
+          <br>
+          <select id="inputState" class="form-control">
+            <option selected>Choose...</option>
+            <option value='1'> 1 </option>
+            <option value='2'> 2 </option>
+            <option value='3'> 3 </option>
+            <option value='4'> 4 </option>
+            <option value='5'> 5 </option>
+          </select>
+          <br>
+          <input type="text" class="form-control" aria-describedby="emailHelp" placeholder="Reviews">
         </div>
-        <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+        <button type="submit" id="submit" class="btn btn-primary btn-sm">Submit</button>
       </form>
     </div>
     <div class="col">

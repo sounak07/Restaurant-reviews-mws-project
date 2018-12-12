@@ -122,7 +122,7 @@ const fillRestaurantHTML = (restaurant = self.restaurant) => {
     fillRestaurantHoursHTML();
   }
   // fill reviews
-  fillReviewsHTML();
+  fillReviewsHTML(self.restaurant.id);
 };
 
 /**
@@ -147,26 +147,46 @@ const fillRestaurantHoursHTML = (
   }
 };
 
+document.getElementById('submit').addEventListener('click', () => {
+  let user_reviews = document.getElementById('inputState').value;
+  let curr_url = window.location.href;
+  let id = parseInt(curr_url[curr_url.length - 1]);
+  let rating = parseInt(document.getElementById('inputState').value);
+  let user_name = document.getElementById('nam').value;
+  let review = {
+    "restaurant_id": id,
+    "name": user_name,
+    "createdAt": new Date().getTime(),
+    "updatedAt": new Date().getTime(),
+    "comments": user_reviews
+  }
+  DBHelper.putReviewsInDb(review);
+});
+
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-const fillReviewsHTML = (reviews = self.restaurant.reviews) => {
+const fillReviewsHTML = (id) => {
   const container = document.getElementById('reviews-container');
   const title = document.createElement('h3');
   title.innerHTML = 'Reviews';
   container.appendChild(title);
 
-  if (!reviews) {
-    const noReviews = document.createElement('p');
-    noReviews.innerHTML = 'No reviews yet!';
-    container.appendChild(noReviews);
-    return;
-  }
-  const ul = document.getElementById('reviews-list');
-  reviews.forEach(review => {
-    ul.appendChild(createReviewHTML(review));
-  });
-  container.appendChild(ul);
+  DBHelper.fetchReviewsByRestaurantId(id)
+    .then(reviews => {
+      if (!reviews || reviews.length == 0) {
+        const noReviews = document.createElement('p');
+        container.appendChild(noReviews);
+        return;
+      }
+      const ul = document.getElementById('reviews-list');
+      reviews.forEach(review => {
+        ul.appendChild(createReviewHTML(review));
+      });
+      container.appendChild(ul);
+    }).catch(error => {
+      console.log(error)
+    });
 };
 
 /**
