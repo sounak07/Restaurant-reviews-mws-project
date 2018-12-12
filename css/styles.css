@@ -422,22 +422,22 @@ th {
   font-size: 16px;
 }
 
-#reviews-list li p:first-child {
+#reviews-list li .review-name {
   color: steelblue;
   font-weight: bold;
   font-size: 20px;
 }
 
-#reviews-list li p:nth-child(2) {
+#reviews-list li .review-date {
   color: rgb(33, 35, 37);
 }
 
-#reviews-list li p:nth-child(3) {
+#reviews-list li .review-rating {
   font-weight: bold;
   color: #55074e;
 }
 
-#reviews-list li p:nth-child(4) {
+#reviews-list li .review-comments {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 16.5px;
 }

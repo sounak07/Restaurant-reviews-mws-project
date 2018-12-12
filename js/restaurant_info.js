@@ -7,6 +7,11 @@ let newMap;
 document.addEventListener('DOMContentLoaded', event => {
   initMap();
   serviceWorkerRegistration();
+  const reviewFormRating = document.querySelector('.review-form-rating');
+  const btnSubmitReview = document.querySelector('.btn-submit-review');
+  reviewFormRating.addEventListener('change', validateRating);
+  reviewFormRating.addEventListener('keyup', validateRating);
+  btnSubmitReview.addEventListener('click', addReview);
 });
 
 // Registration of service worker
@@ -166,59 +171,84 @@ document.getElementById('submit').addEventListener('click', () => {
 /**
  * Create all reviews HTML and add them to the webpage.
  */
-const fillReviewsHTML = (id) => {
+const fillReviewsHTML = () => {
   const container = document.getElementById('reviews-container');
-  const title = document.createElement('h3');
+  const title = document.createElement('h2');
   title.innerHTML = 'Reviews';
-  container.appendChild(title);
-
-  DBHelper.fetchReviewsByRestaurantId(id)
+  container.insertAdjacentElement('afterbegin', title);
+  const reviewForm = document.querySelector('.review-input');
+  const restaurantId = self.restaurant.id;
+  DBHelper.fetchRestaurantReviewsById(restaurantId)
     .then(reviews => {
-      if (!reviews || reviews.length == 0) {
+      if (!reviews || (reviews && reviews.length === 0)) {
         const noReviews = document.createElement('p');
-        container.appendChild(noReviews);
+        noReviews.innerHTML = 'No reviews yet!';
+        container.insertBefore(noReviews, reviewForm);
         return;
       }
       const ul = document.getElementById('reviews-list');
       reviews.forEach(review => {
         ul.appendChild(createReviewHTML(review));
       });
-      container.appendChild(ul);
-    }).catch(error => {
-      console.log(error)
+    })
+    .catch(_ => {
+      const noReviews = document.createElement('p');
+      noReviews.innerHTML = 'No reviews yet!';
+      container.insertBefore(noReviews, reviewForm);
     });
 };
 
 /**
  * Create review HTML and add it to the webpage.
  */
-const createReviewHTML = review => {
+const createReviewHTML = (review) => {
   const li = document.createElement('li');
   const name = document.createElement('p');
-  //added icon for user
-  const iconuser = document.createElement('i');
-  iconuser.setAttribute('class', 'fas fa-user');
-  name.innerHTML = ` ${review.name}`;
-  name.prepend(iconuser);
+  name.className = 'review-name';
+  name.innerHTML = review.name;
   li.appendChild(name);
 
   const date = document.createElement('p');
-  //added icon for date
-  const icondate = document.createElement('i');
-  icondate.setAttribute('class', 'fas fa-calendar-alt');
-  date.innerHTML = ` ${review.date}`;
-  date.prepend(icondate);
+  date.className = 'review-date';
+  const updatedCommentDate = new Date(review.updatedAt);
+  date.innerHTML = updatedCommentDate.toLocaleDateString();
   li.appendChild(date);
 
   const rating = document.createElement('p');
+  rating.className = 'review-rating';
   rating.innerHTML = `Rating: ${review.rating}`;
   li.appendChild(rating);
 
   const comments = document.createElement('p');
+  comments.className = 'review-comments';
   comments.innerHTML = review.comments;
   li.appendChild(comments);
 
   return li;
+}
+
+const validateRating = (event) => {
+  const rating = event.target.value;
+  if (rating < 0) {
+    event.target.value = 1;
+  } else if (rating > 5) {
+    event.target.value = 5;
+  }
+};
+/**
+ * Add review entered by user.
+ */
+const addReview = () => {
+  const name = document.querySelector('.review-form-name');
+  const rating = document.querySelector('.review-form-rating');
+  const comments = document.querySelector('.review-form-comments');
+  const review = {
+    "restaurant_id": self.restaurant.id,
+    "name": name.value,
+    "rating": rating.value,
+    "comments": comments.textContent
+  };
+  DBHelper.postReview(review);
 };
 
 /**
