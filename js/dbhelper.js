@@ -6,8 +6,6 @@
 //   self.importScripts('js/idb.js');
 // }
 
-sync_reviews = [];
-
 class DBHelper {
   /**
    * Database URL.
@@ -34,9 +32,6 @@ class DBHelper {
             keyPath: 'id'
           });
           store.createIndex('by-id', 'id');
-
-        case 1:
-          upgradeDb.createObjectStore('reviews');
       }
     });
   }
@@ -61,75 +56,6 @@ class DBHelper {
   //     tx.complete;
   //   });
   // }
-
-  /**
-   * Fetch all reviews by id.
-   */
-
-  static getReviewsByRestaurantFromDb(dbPromise, restaurantId) {
-    return dbPromise.then(function (db) {
-      if (!db) return;
-      let tx = db.transaction('reviews');
-      let restaurantsStore = tx.objectStore('reviews');
-      return restaurantsStore.get(restaurantId);
-    });
-  }
-
-
-  // update reviews
-
-  static updateReviewsByRestaurantInDb(dbPromise, restaurantId, reviews) {
-    return dbPromise.then(function (db) {
-      if (!db) return;
-      let tx = db.transaction('reviews', 'readwrite');
-      let restaurantsStore = tx.objectStore('reviews');
-      restaurantsStore.put(reviews, restaurantId);
-      tx.complete;
-    });
-  }
-
-
-
-  static fetchRestaurantReviewsById(restaurantId) {
-    const url = `http://localhost:1337/reviews/?restaurant_id=${restaurantId}`;
-    return fetch(url)
-      .then(response => response.json())
-      .catch(error => {
-        console.log(`Some error occurred while fetching restaurant reviews by ID: ${error}`);
-      });
-  }
-  static postReview(review) {}
-
-
-
-  static putReviewsInDb(review_dict) {
-    const dbPromise = DBHelper.initIDB();
-    console.log(review_dict.restaurant_id);
-    console.log(typeof review_dict.restaurant_id);
-    DBHelper.getReviewsByRestaurant(dbPromise, review_dict.restaurant_id)
-      .then(reviews => {
-        if (!reviews) return;
-        reviews.push(reviews);
-        DBHelper.updateReviewsToDb(dbPromise, review_dict.restaurant_id, review_dict)
-        if (navigator.onLine) {
-          const review_url = 'http://localhost:1337/reviews';
-          console.log('putReviewsInDb2');
-          return fetch(review_url, {
-            method: 'POST',
-            body: JSON.stringify(review_dict),
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          });
-        } else {
-          reviews_to_sync.push(review_dict)
-        }
-      }).catch(error => {
-        console.log(error);
-      })
-  }
-
-
 
   /**
    * Fetch all restaurants.
